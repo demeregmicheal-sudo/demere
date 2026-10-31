@@ -1,0 +1,8 @@
+{
+  "name": "ምክሃ ደናግል ሰንበት ት/ቤት - የመገኘት መመዝገቢያ",
+  "description": "ለምክሃ ደናግል ሰንበት ት/ቤት የሰንበት ተማሪዎችን እና የእናቶችን አቴንዳንስ መመዝገቢያና መቆጣጠሪያ የሞባይል መተግበሪያ እና የአስተዳዳሪ ፖርታል",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
