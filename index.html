@@ -2,6 +2,67 @@
 <html lang="am">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      /* Safeguard against browser extensions attempting to assign window.fetch */
+      (function() {
+        try {
+          var origFetch = window.fetch ? window.fetch.bind(window) : null;
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            try {
+              Object.defineProperty(Window.prototype, 'fetch', {
+                get: function() {
+                  return (this && this.__customFetch) || origFetch;
+                },
+                set: function(fn) {
+                  if (this) {
+                    this.__customFetch = fn;
+                  }
+                },
+                configurable: true,
+                enumerable: true
+              });
+            } catch (_) {}
+          }
+          try {
+            Object.defineProperty(window, 'fetch', {
+              value: origFetch,
+              writable: true,
+              configurable: true,
+              enumerable: true
+            });
+          } catch (_) {}
+        } catch (_) {}
+
+        var suppressError = function(e) {
+          var isExtension = (e.filename && e.filename.indexOf('chrome-extension://') !== -1) ||
+                            (e.message && e.message.indexOf('fetch') !== -1) ||
+                            (e.error && e.error.stack && e.error.stack.indexOf('chrome-extension://') !== -1);
+          if (isExtension) {
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+            return true;
+          }
+        };
+
+        window.addEventListener('error', suppressError, true);
+        window.addEventListener('unhandledrejection', function(e) {
+          if (e.reason && e.reason.stack && e.reason.stack.indexOf('chrome-extension://') !== -1) {
+            e.preventDefault();
+          }
+        }, true);
+
+        var prevOnError = window.onerror;
+        window.onerror = function(msg, url, line, col, err) {
+          if ((url && url.indexOf('chrome-extension://') !== -1) || (msg && msg.indexOf('fetch') !== -1)) {
+            return true;
+          }
+          if (typeof prevOnError === 'function') {
+            return prevOnError.apply(this, arguments);
+          }
+          return false;
+        };
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>ምክሃ ደናግል ሰንበት ት/ቤት - የመገኘት መመዝገቢያ</title>
     <meta name="description" content="ለምክሃ ደናግል ሰንበት ት/ቤት የሰንበት ተማሪዎችን እና የእናቶችን አቴንዳንስ መመዝገቢያና መቆጣጠሪያ የሞባይል መተግበሪያ እና የአስተዳዳሪ ፖርታል" />
